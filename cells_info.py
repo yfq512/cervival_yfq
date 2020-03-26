@@ -34,7 +34,7 @@ def get_cell_nuclei_mask(img, img_org, value):
     thresh_ = thresh*0
     thresh__ = cv2.fillConvexPoly(thresh_, contours_best, 255)
     value_1,_ = bf.get_2value(img_org,chan=2, mask = thresh__)
-    return 1, thresh__, cnt, area, perimeter, rule, value_1
+    return 1, thresh__, cnt+1, area, perimeter, rule, value_1
     
     
 def get_cell_cytoplasm_mask(img, nuclei_mask, img_org, value):
@@ -61,7 +61,7 @@ def get_cell_cytoplasm_mask(img, nuclei_mask, img_org, value):
     return 1, thresh___, area_, perimeter, rule, value_1
  
 if __name__ == "__main__":
-    dstroot = 'crop'
+    dstroot = 'cells_xc'
     listcells = os.listdir(dstroot)
     cellsinfo = []
     for n in listcells:

@@ -9,7 +9,7 @@ import basefun as bf
 def get_cells(img, imgpath, value, fit, limit_up, limit_down, side=5):
     ret_, thresh = cv2.threshold(img, value, 255, cv2.THRESH_BINARY_INV)
    # thresh = get_img_open(thresh,fit*0.1) #过滤杂质
-    cv2.imwrite(imgpath+'abc2.png', thresh)
+    #cv2.imwrite(imgpath+'abc2.png', thresh)
     image_, contours, hierarchy_ = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     cells_xoy = []
     for cnt in range(0,len(contours,)):
@@ -60,7 +60,7 @@ def plot_on_fov(img, imgpath, xoy):
     for n in xoy:
         [x1,y1,x2,y2] = n
         img =  cv2.rectangle(img, (x1,y1), (x2,y2), (0,255,0),2)
-    cv2.imwrite(imgpath+'abc.png', img)
+    #cv2.imwrite(imgpath+'abc.png', img)
   
 if __name__ == "__main__":
     dstroot = 'fovs'
