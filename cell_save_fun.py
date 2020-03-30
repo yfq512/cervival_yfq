@@ -118,6 +118,100 @@ def get_entropy(img_):
             res = float(res - tmp[i] * (math.log(tmp[i]) / math.log(2.0)))
     return res
 
+def Hamming_distance(hash1, hash2):
+    num = 0
+    for index in range(len(hash1)):
+        if hash1[index] != hash2[index]:
+            num += 1
+    return num
+
+def dhashcaulate(gray):
+    hash_str = ''
+    for i in range(8):
+        for j in range(8):
+            if gray[i, j] > gray[i, j + 1]:
+                hash_str = hash_str + '1'
+            else:
+                hash_str = hash_str + '0'
+    return hash_str
+
+def dhash(image1,image2):
+    image1 = cv2.resize(image1,(9,8))
+    image2 = cv2.resize(image2,(9,8))
+    #gray1 = cv2.cvtColor(image1,cv2.COLOR_BGR2GRAY)  #切换至灰度图
+    #gray2 = cv2.cvtColor(image2,cv2.COLOR_BGR2GRAY)
+    gray1 = image1
+    gray2 = image2
+    hash1 = dhashcaulate(gray1)
+    hash2 = dhashcaulate(gray2)
+    return Hamming_distance(hash1,hash2)
+
+def get_mindHash(img,stand='stand_img'):
+    list_img = os.listdir(stand)
+    values = []
+    for n in list_img:
+        path_std = os.path.join(stand, n)
+        img_temp = cv2.imread(path_std, 0)
+        value = dhash(img,img_temp)
+        values.append(value)
+    values = np.array(values)
+    #print(values)
+    return values.mean()
+
+def get_min_std_matrix(A): # 制作最分布均匀矩阵
+    sum_ = sum(sum(A))
+    [x_side, y_side] = A.shape
+    B = np.zeros((x_side,y_side))
+    long_ = int(x_side*y_side/sum_)
+    cnt = 0
+    for i in range(0,x_side):
+        for j in range(0,y_side):
+            cnt = cnt + 1
+            if cnt%long_ == 0:
+                B[i,j] = 1
+    return B
+ 
+def get_max_std_matrix(A): # 制作分布最不均匀矩阵
+    sum_ = sum(sum(A))
+    [x_side, y_side] = A.shape
+    B = np.zeros((x_side,y_side))
+    cnt = 0
+    for i in range(0,x_side):
+        for j in range(0,y_side):
+            B[i,j] = 1
+            cnt = cnt + 1
+            if cnt >= sum_:
+                break
+    return B
+
+def get_rand_std(rand_matrix): # 输入矩阵为0,1矩阵，计算矩阵分布均匀程度
+    sum_ = sum(sum(rand_matrix))
+    [x_side, y_side] = rand_matrix.shape
+    fit_x_side = int(x_side/10)
+    fit_y_side = int(y_side/10)
+    location_p = []
+    for i in range(0, x_side-10, int(fit_x_side/2)): # 让每个元素被扫描两次（规则自己随便定，保证元素都被扫描到就行）
+        for j in range(0,y_side-10, int(fit_y_side/2)):
+            temp_matrix = rand_matrix[i:i+10,j:j+10]
+            cnt_p = sum(sum(temp_matrix))
+            location_p.append(cnt_p)
+    std = np.std(location_p)
+    return std
+ 
+def get_stand_std(A): # 将均匀程度分布在0,1之间，1表示分布最均匀
+    if sum(sum(A)) == 0:
+        print('不得传入全0矩阵')
+        exit()
+    A_max = get_max_std_matrix(A)
+    A_min = get_min_std_matrix(A)
+    A_std = get_rand_std(A)
+    A_max_std = get_rand_std(A_max)
+    A_min_std = get_rand_std(A_min)
+    if A_std < A_min_std:
+        return 1
+    else:
+        return max(0,(A_max_std-A_std)/(A_max_std-A_min_std))
+
 if __name__ == "__main__":
     dstroot = 'crop'
  #   find_invalid_cells(dstroot,50)
@@ -125,11 +219,15 @@ if __name__ == "__main__":
     for n in list__:
         imgpath = os.path.join(dstroot, n)
         img = cv2.imread(imgpath, 0)
+        value_dhash = get_mindHash(img)
         img_fit = get_fit_img(img)
         cnt = get_2value(img_fit)
         res = get_entropy(img_fit)
         _, value2 = bf.get_2value(img_fit)
         ret_, thresh = cv2.threshold(img, value2, 255, cv2.THRESH_BINARY_INV)
+        matrix_01 = thresh/255
+        matrix_01 = cv2.resize(matrix_01,(64,64))
+        rand_value = get_stand_std(matrix_01)
         kernel_1 = np.ones((5,5),np.uint8)
         thresh = bf.get_img_open(thresh,kernel_1)
        # thresh = bf.get_img_close(thresh,kernel_1)
@@ -152,14 +250,14 @@ if __name__ == "__main__":
                 rule = perimeter/area_
         thresh2 = thresh*0
         thresh2 = cv2.fillConvexPoly(thresh2, contours_max, 255)
-        print('规则度',rule)
-        if rule < 0.14:
+        print(rand_value)
+        if rand_value >0.3:
+        #if rule < 0.14:
         #if cnt < 12 and cnt >=7 and rule <0.14:
  #       if res < 6:
-            print(res)
             #print(imgpath)
             #print('abnormal',cnt)
-            newpath = os.path.join('valid',n+'_'+str(cnt)+'_'+str(rule)+'.png')
+            newpath = os.path.join('valid',n+'_'+str(cnt)+'_'+str(rand_value)+'.png')
             #cv2.imwrite(newpath+'_'+str(rule)+'_'+'abc.png', thresh2)
             #cv2.imwrite(newpath+'_'+str(rule)+'_'+'abc2.png', thresh)
             shutil.copy(imgpath,newpath)
