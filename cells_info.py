@@ -66,9 +66,27 @@ def get_cell_cytoplasm_mask(img, nuclei_mask, img_org, value):
     thresh___ = thresh__*(nuclei_mask_off/255)
     value_1,_ = bf.get_2value(img_org,chan = 0,mask = thresh__)
     return 1, thresh___, area_, area2, perimeter, rule, value_1
- 
+
+def get_cell_save_sign(cellinfo):
+    nuclei_area = []
+    nuclei_hull_area = []
+    cytoplasm_area = []
+    cytoplasm_hull_area = []
+    nuclei_area = cellinfo['nuclei_area']
+    nuclei_hull_area = cellinfo['nuclei_hull_area']
+    cytoplasm_area = cellinfo['cytoplasm_area']
+    cytoplasm_hull_area = cellinfo['cytoplasm_hull_area']
+    nuclei_va = nuclei_area/nuclei_hull_area
+    cytoplasm_va = cytoplasm_area/cytoplasm_hull_area
+    area_diff = cytoplasm_area - nuclei_area
+    if nuclei_va < 0.9 or cytoplasm_va < 0.85 or area_diff <150:
+        sign = 0
+    else:
+        sign = 1
+    return sign
+
 if __name__ == "__main__":
-    dstroot = 'crop'
+    dstroot = 'cells_abnormal'
     listcells = os.listdir(dstroot)
     cellsinfo = []
     for n in listcells:
@@ -80,16 +98,19 @@ if __name__ == "__main__":
      #   cv2.imwrite(cellpath+'abc0.png',img_gray)
         value_1,value_2 = bf.get_2value(img_gray)
         sign_nuclei, cell_nuclei_mask, nuclei_cnt, nuclei_area, nuclei_hull_area, nuclei_circ, nuclei_rule, cell_nuclei_value = get_cell_nuclei_mask(img_gray, img, value_1) #获取细胞核掩码、个数、面积、凸面积、周长、核形规则度、获取细胞核深染程度
-     #   cv2.imwrite(cellpath+'abc1.png',cell_nuclei_mask)
+        cv2.imwrite(cellpath+'abc1.png',cell_nuclei_mask)
         if sign_nuclei == 0:
             continue
         sign_cytoplasm, cell_cytoplasm_mask, cytoplasm_area, cytoplasm_hull_area, cytoplasm_circ, cytoplasm_rule, cell_cytoplasm_value = get_cell_cytoplasm_mask(img_gray, cell_nuclei_mask, img, value_2) #获取细胞质掩码、面积、凸面积、周长、细胞规则度、获取细胞质情况
-     #   cv2.imwrite(cellpath+'abc2.png',cell_cytoplasm_mask)
+        cv2.imwrite(cellpath+'abc2.png',cell_cytoplasm_mask)
         if sign_cytoplasm == 0:
             continue
         cell_N_C = nuclei_area/(cytoplasm_area-nuclei_area) #计算核质比
         cellinfo_keys = ['cellpath','nuclei_cnt','nuclei_area','nuclei_hull_area','nuclei_circ','nuclei_rule','cell_nuclei_value','cytoplasm_area','cytoplasm_hull_area','cytoplasm_circ','cytoplasm_rule','cell_cytoplasm_value','cell_N_C']
         cellinfo_values = [cellpath,nuclei_cnt,nuclei_area,nuclei_hull_area,nuclei_circ,nuclei_rule,cell_nuclei_value,cytoplasm_area,cytoplasm_hull_area,cytoplasm_circ,cytoplasm_rule,cell_cytoplasm_value,cell_N_C]
         cellinfo = dict(zip(cellinfo_keys, cellinfo_values))
+        cell_save_sign = get_cell_save_sign(cellinfo)
+        if cell_save_sign == 0:
+            continue
         cellsinfo.append(cellinfo)
     np.save("./cells_info/cells_info.npy", cellsinfo)
