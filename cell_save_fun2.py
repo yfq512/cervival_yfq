@@ -2,6 +2,7 @@ import os, copy
 import numpy as np
 import shutil
 
+# 主要方法是判断图像为“凸”的程度
 def get_save_sign(cells_info_file):
     cells_info = np.load(cells_info_file)
     nuclei_area = []
