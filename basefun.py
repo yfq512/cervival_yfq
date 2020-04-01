@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import copy
  
 def get_fit_img(img):
-    dst = cv2.fastNlMeansDenoising(img,None,15,7,21)
+    dst = cv2.fastNlMeansDenoising(img,None,8,7,21)
     return dst
  
 def get_mean(temp, long_=10):
