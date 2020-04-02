@@ -26,6 +26,9 @@ def get_cell_nuclei_mask(img, img_org, value):
         if _long < long_:
             contours_best = contours[cnt]
             long_ = _long
+    [w_img,h_img] = thresh.shape
+    if (0 in contours_best) or ((w_img-1) in contours_best) or ((h_img-1) in contours_best):
+        return 0, 0, 0, 0, 0, 0, 0, 0
     area = cv2.contourArea(contours_best)
     perimeter = cv2.arcLength(contours_best,True)
     hull = cv2.convexHull(contours_best)
@@ -41,7 +44,7 @@ def get_cell_nuclei_mask(img, img_org, value):
     return 1, thresh__, cnt+1, area, area2, perimeter, rule, value_1
     
     
-def get_cell_cytoplasm_mask(img, nuclei_mask, img_org, value):
+def get_cell_cytoplasm_mask(img, nuclei_mask, nuclei_area, img_org, value):
     ret_, thresh = cv2.threshold(img, value, 255, cv2.THRESH_BINARY_INV)
     image_, contours, hierarchy_ = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     if len(contours) == 0:
@@ -61,6 +64,13 @@ def get_cell_cytoplasm_mask(img, nuclei_mask, img_org, value):
     rule = perimeter/area_
     thresh_ = thresh*0
     thresh__ = cv2.fillPoly(thresh_, [contours_max], 255)
+    thresh__1 = thresh__ * (nuclei_mask/255)
+    _area = sum(sum(thresh__1))
+    if _area == 0:
+        return 0,0,0,0,0,0,0
+    [w_img,h_img] = thresh__.shape
+    if thresh__[0,0] == 255 or thresh__[w_img-1,0] == 255 or thresh__[0,h_img-1] == 255 or thresh__[w_img-1,h_img-1] == 255:
+        return 0,0,0,0,0,0,0
     thresh__ = cv2.polylines(thresh__, [hull], True, 255, 1)
     nuclei_mask_off = np.ones(nuclei_mask.shape)*255 - nuclei_mask
     thresh___ = thresh__*(nuclei_mask_off/255)
@@ -86,7 +96,7 @@ def get_cell_save_sign(cellinfo):
     return sign
 
 if __name__ == "__main__":
-    dstroot = 'cells_abnormal'
+    dstroot = 'valid'
     listcells = os.listdir(dstroot)
     cellsinfo = []
     for n in listcells:
@@ -101,9 +111,9 @@ if __name__ == "__main__":
         cv2.imwrite(cellpath+'abc1.png',cell_nuclei_mask)
         if sign_nuclei == 0:
             continue
-        sign_cytoplasm, cell_cytoplasm_mask, cytoplasm_area, cytoplasm_hull_area, cytoplasm_circ, cytoplasm_rule, cell_cytoplasm_value = get_cell_cytoplasm_mask(img_gray, cell_nuclei_mask, img, value_2) #获取细胞质掩码、面积、凸面积、周长、细胞规则度、获取细胞质情况
+        sign_cytoplasm, cell_cytoplasm_mask, cytoplasm_area, cytoplasm_hull_area, cytoplasm_circ, cytoplasm_rule, cell_cytoplasm_value = get_cell_cytoplasm_mask(img_gray, cell_nuclei_mask, nuclei_area,img, value_2) #获取细胞质掩码、面积、凸面积、周长、细胞规则度、获取细胞质情况
         cv2.imwrite(cellpath+'abc2.png',cell_cytoplasm_mask)
-        if sign_cytoplasm == 0:
+        if sign_cytoplasm == 0 or (cytoplasm_area-nuclei_area) == 0:
             continue
         cell_N_C = nuclei_area/(cytoplasm_area-nuclei_area) #计算核质比
         cellinfo_keys = ['cellpath','nuclei_cnt','nuclei_area','nuclei_hull_area','nuclei_circ','nuclei_rule','cell_nuclei_value','cytoplasm_area','cytoplasm_hull_area','cytoplasm_circ','cytoplasm_rule','cell_cytoplasm_value','cell_N_C']
@@ -113,4 +123,4 @@ if __name__ == "__main__":
         if cell_save_sign == 0:
             continue
         cellsinfo.append(cellinfo)
-    np.save("./cells_info/cells_info.npy", cellsinfo)
+    np.save("./cells_info/cells_info2.npy", cellsinfo)
