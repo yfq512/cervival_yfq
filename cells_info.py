@@ -36,7 +36,7 @@ def get_cell_nuclei_mask(img, img_org, value):
     
     if area == 0:
         return 0, 0, 0, 0, 0, 0, 0, 0
-    rule = perimeter/area
+    rule = area/area2
     thresh_ = thresh*0
     thresh__ = cv2.fillPoly(thresh_, [contours_best], 255)
     thresh__ = cv2.polylines(thresh__, [hull], True, 255, 1)
@@ -61,7 +61,7 @@ def get_cell_cytoplasm_mask(img, nuclei_mask, nuclei_area, img_org, value):
     perimeter = cv2.arcLength(contours_max,True)
     if area_ == 0:
         return 0,0,0,0,0,0,0
-    rule = perimeter/area_
+    rule = area_/area2
     thresh_ = thresh*0
     thresh__ = cv2.fillPoly(thresh_, [contours_max], 255)
     thresh__1 = thresh__ * (nuclei_mask/255)
