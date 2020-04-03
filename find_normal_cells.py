@@ -12,6 +12,7 @@ def get_mean(temp, long_):
     temp_out = np.zeros(limit)
     temp_out[0+long_: limit-long_] = temp_2
     return temp_out
+
 def find_normal_cells(cells_info_file):
     cells_info = np.load(cells_info_file)
     temp = []
@@ -27,12 +28,12 @@ def find_normal_cells(cells_info_file):
     value = dict_.values()
     key = dict_.keys()
     value = np.array(list(value))
-    temp3 = get_mean(value, long_ = 5)
-    print('平滑矩阵',len(value), len(temp3))
+    temp3 = get_mean(value, 5)
+ #   print('平滑矩阵',len(value), len(temp3))
     temp4 = np.argmax(temp3)
-    print('最大索引',temp4, len(key))
+ #   print('最大索引',temp4, len(key))
     temp5 = list(key)[temp4]
-    print('众数',temp5)
+ #   print('众数',temp5)
     limit = temp5*0.3
     cnt_ = 0
     cells_i = []
@@ -152,9 +153,15 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
         sign = 1
     return sign
 
-if __name__ == "__main__":
+def main2():
     cells_info_file = 'cells_info/cells_info.npy'
     normal_cells_i = find_normal_cells(cells_info_file)
     normal_cell_info = get_normal_cell_info(cells_info_file, normal_cells_i)
-    print(normal_cell_info)
+  #  print(normal_cell_info)
     sign = find_abnormal_cells(cells_info_file, normal_cell_info)
+#if __name__ == "__main__":
+#    cells_info_file = 'cells_info/cells_info.npy'
+#    normal_cells_i = find_normal_cells(cells_info_file)
+#    normal_cell_info = get_normal_cell_info(cells_info_file, normal_cells_i)
+#    print(normal_cell_info)
+#    sign = find_abnormal_cells(cells_info_file, normal_cell_info)

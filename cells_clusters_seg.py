@@ -62,7 +62,7 @@ def plot_on_fov(img, imgpath, xoy):
         img =  cv2.rectangle(img, (x1,y1), (x2,y2), (0,255,0),2)
     #cv2.imwrite(imgpath+'abc.png', img)
   
-if __name__ == "__main__":
+def main2():
     dstroot = 'fovs'
     list_dst = os.listdir(dstroot)
     for n in list_dst:
@@ -78,3 +78,20 @@ if __name__ == "__main__":
         clusters_xoy = get_clusters(img_gray_fit, value_1, kernel_2, 50000, side=5)
         crop_from_fov(img_org, n, cells_xoy)
         plot_on_fov(img_org, imgpath, cells_xoy)
+
+#if __name__ == "__main__":
+#    dstroot = 'fovs'
+#    list_dst = os.listdir(dstroot)
+#    for n in list_dst:
+#        imgpath = os.path.join(dstroot, n)
+#        print(imgpath)
+#        img_org = cv2.imread(imgpath)
+#        img_gray = cv2.imread(imgpath,0)
+#        img_gray_fit = bf.get_fit_img(img_gray)
+#        value_1,value_2 = bf.get_2value(img_gray_fit) # 获取细胞核、背景阈值
+#        kernel_1 = np.ones((50,50),np.uint8)
+#        kernel_2 = np.ones((101,101),np.uint8)
+#        cells_xoy = get_cells(img_gray_fit, imgpath, value_2+10, kernel_1, 50000, 1600, side=5)
+#        clusters_xoy = get_clusters(img_gray_fit, value_1, kernel_2, 50000, side=5)
+#        crop_from_fov(img_org, n, cells_xoy)
+#        plot_on_fov(img_org, imgpath, cells_xoy)

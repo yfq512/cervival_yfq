@@ -37,4 +37,5 @@ if __name__ == "__main__":
     get_save_sign(cells_info_file)
 #细胞核靠近图像边缘就pass（靠近用信心点坐标，或细胞核像素坐标贴在边缘）
 #细胞质不包含细胞核pass
+#细胞质占领四角的超过一个顶角的pass
 #细胞过滤就大功告成
