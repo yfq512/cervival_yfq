@@ -159,9 +159,9 @@ def main2():
     normal_cell_info = get_normal_cell_info(cells_info_file, normal_cells_i)
   #  print(normal_cell_info)
     sign = find_abnormal_cells(cells_info_file, normal_cell_info)
-#if __name__ == "__main__":
-#    cells_info_file = 'cells_info/cells_info.npy'
-#    normal_cells_i = find_normal_cells(cells_info_file)
-#    normal_cell_info = get_normal_cell_info(cells_info_file, normal_cells_i)
-#    print(normal_cell_info)
-#    sign = find_abnormal_cells(cells_info_file, normal_cell_info)
+if __name__ == "__main__":
+    cells_info_file = 'cells_info/cells_info.npy'
+    normal_cells_i = find_normal_cells(cells_info_file)
+    normal_cell_info = get_normal_cell_info(cells_info_file, normal_cells_i)
+    print(normal_cell_info)
+    sign = find_abnormal_cells(cells_info_file, normal_cell_info)
