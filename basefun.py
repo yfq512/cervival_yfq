@@ -3,11 +3,13 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
- 
+from numba import jit
+
 def get_fit_img(img):
     dst = cv2.fastNlMeansDenoising(img,None,8,7,21)
     return dst
- 
+
+@jit
 def get_mean(temp, long_=10):
     temp_1 = []
     for m in range(0+long_, 255-long_):
@@ -16,14 +18,16 @@ def get_mean(temp, long_=10):
     temp_out = np.zeros(255)
     temp_out[0+long_: 255-long_] = temp_2
     return temp_out
- 
+
+@jit
 def grien_value(temp):
     temp_1 = np.zeros(255)
     temp_1[1:255] = temp[0:254]
     temp_out = temp - temp_1
     temp_out = get_mean(temp_out, 10)
     return temp_out
- 
+
+@jit
 def get_last2value(temp):
     sign1 = 0
     sign2 = 0
@@ -45,7 +49,7 @@ def get_last2value(temp):
             value = k
             break #!!!!!!!!!
     return 255-value
- 
+
 def get_2value(img, long_ = 10, chan = 0, mask = None, grien = 2):
     temp_2 = cv2.calcHist([img],[chan],mask,[256],[0,255])
     temp_4 = get_mean(temp_2, long_)
