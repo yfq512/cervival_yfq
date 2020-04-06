@@ -53,13 +53,21 @@ if __name__ == "__main__":
     list_clusters_info = os.listdir(clusters_info__root)
     if len(list_clusters_info) == 0:
         print('================can not find files in clusters================')
-        exit()
-    get_ab_clusters()
+        ab_clusters_cnt = 0
+    else:
+        get_ab_clusters()
+        ab_clusters_cnt = len(os.listdir('ab_clusters'))
 
     cells_info__root = 'cells_info'
     list_cells_info = os.listdir(cells_info__root)
     if len(list_cells_info) == 0:
         print('================can not find files in cells_info================')
-        exit()
+        valid_cells_cnt = 0
+    else:
+        valid_cells_cnt = len(os.listdir('valid'))
     get_abnormal_cells()
+    ab_cells_cnt = len(os.listdir('ab_cells'))
+    print('valid cells cnt:', valid_cells_cnt)
+    print('abnormal cells cnt:', ab_cells_cnt)
+    print('abnormal clusters cnt:', ab_clusters_cnt)
 

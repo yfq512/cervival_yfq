@@ -1,4 +1,4 @@
-import os,time
+import os,time,shutil
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -123,6 +123,8 @@ def main2():
         if cell_save_sign == 0:
             continue
         cellsinfo.append(cellinfo)
+        newpath = os.path.join('valid', n)
+        shutil.copy(cellpath, newpath)
     np.save("./cells_info/cells_info.npy", cellsinfo)
 
 if __name__ == "__main__":
