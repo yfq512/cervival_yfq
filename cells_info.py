@@ -153,4 +153,6 @@ if __name__ == "__main__":
         if cell_save_sign == 0:
             continue
         cellsinfo.append(cellinfo)
+        newpath = os.path.join('valid', n)
+        shutil.copy(cellpath, newpath)
     np.save("./cells_info/cells_info.npy", cellsinfo)

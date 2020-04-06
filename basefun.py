@@ -46,11 +46,14 @@ def get_last2value(temp):
             break #!!!!!!!!!
     return 255-value
  
-def get_2value(img, long_ = 10, chan = 0, mask = None):
+def get_2value(img, long_ = 10, chan = 0, mask = None, grien = 2):
     temp_2 = cv2.calcHist([img],[chan],mask,[256],[0,255])
     temp_4 = get_mean(temp_2, long_)
     temp_4 = get_mean(temp_4, 5)
-    temp_4 = grien_value(temp_4) #使用二阶导数更容易检测到细胞核像素阈值
+    if grien == 2:
+        temp_4 = grien_value(temp_4) #使用二阶导数更容易检测到细胞核像素阈值
+    else:
+        temp_4 = grien_value(grien_value(temp_4)) #用于检测细胞团或颜色深的细胞核
 #    plt.figure("Image")
 #    plt.imshow(img)
 #    plt.figure("Image_value")

@@ -5,6 +5,7 @@ import basefun as bf
 import cells_clusters_seg
 import cells_info
 import find_normal_cells
+import clusters_info
 
 def clean_file(dst):
     print('================clean dirs================')
@@ -17,36 +18,48 @@ def clean_file(dst):
 
 def seg_cells(fovs_root):
     print('================seg cells================')
-    activate_this = 'cells_clusters_seg.py'
-    #execfile(activate_this, dict(__file__=activate_this))
-    #exec(open(activate_this).read())
     cells_clusters_seg.main2()
 
 def get_valid_cells_info():
     print('================get valid cells info================')
-    activate_this = 'cells_info.py'
-    #execfile(activate_this, dict(__file__=activate_this))
-    #exec(open(activate_this).read())
     cells_info.main2()
+
+def get_ab_clusters():
+    print('================find abnormal clusters================')
+    clusters_info.main2()
 
 def get_abnormal_cells():
     print('================find abnormal cells================')
-    activate_this = 'find_normal_cells.py'
-    #execfile(activate_this, dict(__file__=activate_this))
-    #exec(open(activate_this).read())
     find_normal_cells.main2()
 
 if __name__ == "__main__":
-    dst = ['crop','valid','invalid','cells_info','cells_abnormal']
+    dst = ['crop','clusters','ab_clusters','valid','invalid','cells_info','ab_cells']
     clean_file(dst)
     fovs_root = 'fovs'
     list_fovs = os.listdir(fovs_root)
     if len(list_fovs) == 0:
         print('================can not find files in fovs================')
         exit()
-    
     seg_cells(fovs_root)
-    
+
+    crop_root = 'crop'
+    list_crop = os.listdir(crop_root)
+    if len(list_crop) == 0:
+        print('================can not find files in crop================')
+        exit()
     get_valid_cells_info()
-    
+
+    clusters_info__root = 'clusters'
+    list_clusters_info = os.listdir(clusters_info__root)
+    if len(list_clusters_info) == 0:
+        print('================can not find files in clusters================')
+        exit()
+    get_ab_clusters()
+
+    cells_info__root = 'cells_info'
+    list_cells_info = os.listdir(cells_info__root)
+    if len(list_cells_info) == 0:
+        print('================can not find files in cells_info================')
+        exit()
     get_abnormal_cells()
+

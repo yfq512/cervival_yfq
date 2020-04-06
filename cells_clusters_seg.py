@@ -29,15 +29,15 @@ def get_cells(img, imgpath, value, fit, limit_up, limit_down, side=5):
 # 获得细胞团坐标
 def get_clusters(img, value, fit, limit_down, side=5):
     ret_, thresh = cv2.threshold(img, value, 255, cv2.THRESH_BINARY_INV)
-    thresh = bf.get_img_close(thresh,fit) #将密集的点连接成片
+    thresh = bf.get_img_close(thresh,fit*0.05) #将密集的点连接成片
     fit2 = fit*0.1
-    thresh = bf.get_img_open(thresh,fit2) #过滤孤立的点
+    #thresh = bf.get_img_open(thresh,fit2) #过滤孤立的点
     image_, contours, hierarchy_ = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     clusters_xoy = []
     for cnt in range(0,len(contours,)):
         area = cv2.contourArea(contours[cnt])
         x,y,w,h=cv2.boundingRect(contours[cnt])
-        [x_,y_] = img.shape
+        [y_,x_] = img.shape
         x1 = max(x-side,0)
         x2 = min(x+w+side,x_)
         y1 = max(y-side,0)
@@ -61,40 +61,40 @@ def plot_on_fov(img, imgpath, xoy):
     for n in xoy:
         [x1,y1,x2,y2] = n
         img =  cv2.rectangle(img, (x1,y1), (x2,y2), (0,255,0),2)
-    #cv2.imwrite(imgpath+'abc.png', img)
+    cv2.imwrite(imgpath+'abc.png', img)
   
 def main2():
     dstroot = 'fovs'
     list_dst = os.listdir(dstroot)
-    cnt = 0
     for n,i in zip(list_dst,tqdm(range(len(list_dst)))):
         imgpath = os.path.join(dstroot, n)
-        #print(imgpath)
+   #     print(imgpath)
         img_org = cv2.imread(imgpath)
         img_gray = cv2.imread(imgpath,0)
         img_gray_fit = bf.get_fit_img(img_gray)
         value_1,value_2 = bf.get_2value(img_gray_fit) # 获取细胞核、背景阈值
         kernel_1 = np.ones((50,50),np.uint8)
-        kernel_2 = np.ones((101,101),np.uint8)
+        kernel_2 = np.ones((5,5),np.uint8)
         cells_xoy = get_cells(img_gray_fit, imgpath, value_2+10, kernel_1, 50000, 1600, side=5)
-        clusters_xoy = get_clusters(img_gray_fit, value_1, kernel_2, 50000, side=5)
+        value_1,value_2 = bf.get_2value(img_gray_fit, grien=3)
+        clusters_xoy = get_clusters(img_gray_fit, value_1, kernel_2, 20000, side=5)
         crop_from_fov(img_org, n, cells_xoy)
-        plot_on_fov(img_org, imgpath, cells_xoy)
-        cnt = cnt + 1
-
-#if __name__ == "__main__":
-#    dstroot = 'fovs'
-#    list_dst = os.listdir(dstroot)
-#    for n in list_dst:
-#        imgpath = os.path.join(dstroot, n)
-#        print(imgpath)
-#        img_org = cv2.imread(imgpath)
-#        img_gray = cv2.imread(imgpath,0)
-#        img_gray_fit = bf.get_fit_img(img_gray)
-#        value_1,value_2 = bf.get_2value(img_gray_fit) # 获取细胞核、背景阈值
-#        kernel_1 = np.ones((50,50),np.uint8)
-#        kernel_2 = np.ones((101,101),np.uint8)
-#        cells_xoy = get_cells(img_gray_fit, imgpath, value_2+10, kernel_1, 50000, 1600, side=5)
-#        clusters_xoy = get_clusters(img_gray_fit, value_1, kernel_2, 50000, side=5)
-#        crop_from_fov(img_org, n, cells_xoy)
-#        plot_on_fov(img_org, imgpath, cells_xoy)
+        crop_from_fov(img_org, n, clusters_xoy, root_ = 'clusters')
+if __name__ == "__main__":
+    dstroot = 'fovs'
+    list_dst = os.listdir(dstroot)
+    for n,i in zip(list_dst,tqdm(range(len(list_dst)))):
+        imgpath = os.path.join(dstroot, n)
+  #      print(imgpath)
+        img_org = cv2.imread(imgpath)
+        img_gray = cv2.imread(imgpath,0)
+        img_gray_fit = bf.get_fit_img(img_gray)
+        value_1,value_2 = bf.get_2value(img_gray_fit) # 获取细胞核、背景阈值
+        kernel_1 = np.ones((50,50),np.uint8)
+        kernel_2 = np.ones((5,5),np.uint8)
+        cells_xoy = get_cells(img_gray_fit, imgpath, value_2+10, kernel_1, 50000, 1600, side=5)
+        value_1,value_2 = bf.get_2value(img_gray_fit, grien=3)
+        clusters_xoy = get_clusters(img_gray_fit, value_1, kernel_2, 20000, side=5)
+        crop_from_fov(img_org, n, cells_xoy)
+        crop_from_fov(img_org, n, clusters_xoy, root_ = 'clusters')
+ #       plot_on_fov(img_gray_fit, imgpath, clusters_xoy)

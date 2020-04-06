@@ -3,16 +3,6 @@ import matplotlib.pyplot as plt
 import basefun as bf
 import os,shutil
 
-def get_mean(temp, long_):
-    limit = len(temp)
-    temp_1 = []
-    for m in range(0+long_, limit-long_):
-        temp_1.append(temp[m-long_:m+long_].mean())
-    temp_2 = np.array(temp_1)
-    temp_out = np.zeros(limit)
-    temp_out[0+long_: limit-long_] = temp_2
-    return temp_out
-
 def find_normal_cells(cells_info_file):
     cells_info = np.load(cells_info_file)
     temp = []
@@ -25,12 +15,12 @@ def find_normal_cells(cells_info_file):
     dict_ = {}
     for key in temp2:
         dict_[key] = dict_.get(key, 0) + 1
+ #   print(dict_)
     value = dict_.values()
     key = dict_.keys()
     value = np.array(list(value))
-    temp3 = get_mean(value, 5)
  #   print('平滑矩阵',len(value), len(temp3))
-    temp4 = np.argmax(temp3)
+    temp4 = np.argmax(value)
  #   print('最大索引',temp4, len(key))
     temp5 = list(key)[temp4]
  #   print('众数',temp5)
@@ -123,7 +113,7 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     mar_cell_N_C = np.array(mar_cell_N_C)
     abnormal_nuclei_area = find_ab_fun(mar_nuclei_area,normal_cell_info['mean_nuclei_area'],2.5)
     abnormal_nuclei_hull_area = find_ab_fun(mar_nuclei_hull_area,normal_cell_info['mean_nuclei_hull_area'],0.1)
-    abnormal_cell_nuclei_value = find_ab_fun(mar_cell_nuclei_value,normal_cell_info['mean_cell_nuclei_value'],0.2)
+    abnormal_cell_nuclei_value = find_ab_fun(mar_cell_nuclei_value,normal_cell_info['mean_cell_nuclei_value'],-0.2)
     abnormal_cytoplasm_area = find_ab_fun(mar_cytoplasm_area,normal_cell_info['mean_cytoplasm_area'],0.1)
     abnormal_cytoplasm_hull_area = find_ab_fun(mar_cytoplasm_hull_area,normal_cell_info['mean_cytoplasm_hull_area'],0.1)
     abnormal_cell_cytoplasm_value = find_ab_fun(mar_cell_cytoplasm_value,normal_cell_info['mean_cell_cytoplasm_value'],0.1)
@@ -133,7 +123,7 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     cells_infos = np.array(cells_infos)
     cells_infos_2 = cells_infos.copy()
     cells_infos_2[0,:] = cells_infos[0,:] * 10 #综合权重
-    cells_infos_2[1,:] = cells_infos[1,:] * 0
+    cells_infos_2[1,:] = cells_infos[1,:] * 10
     cells_infos_2[2,:] = cells_infos[2,:] * 10
     cells_infos_2[3,:] = cells_infos[3,:] * 0
     cells_infos_2[4,:] = cells_infos[4,:] * 0
@@ -145,7 +135,7 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
         sum_ = sum(cells_infos_2[:,n])
         if sum_ >= 30:
             cellpath = cells_info[n]['cellpath']
-            newpath = os.path.join('cells_abnormal', cellpath.split('/')[1])
+            newpath = os.path.join('ab_cells', cellpath.split('/')[1])
             shutil.copy(cellpath, newpath)
             cnt_2 = cnt_2 + 1
     sign = 0
@@ -157,7 +147,7 @@ def main2():
     cells_info_file = 'cells_info/cells_info.npy'
     normal_cells_i = find_normal_cells(cells_info_file)
     normal_cell_info = get_normal_cell_info(cells_info_file, normal_cells_i)
-  #  print(normal_cell_info)
+    print(normal_cell_info)
     sign = find_abnormal_cells(cells_info_file, normal_cell_info)
 if __name__ == "__main__":
     cells_info_file = 'cells_info/cells_info.npy'
