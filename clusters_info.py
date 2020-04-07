@@ -22,7 +22,7 @@ def get_cell_nuclei_mask(img, img_org, value):
         return 0,0,0
     thresh_ = cv2.fillPoly(thresh, [contours_max], 255)
     img_temp = img * (thresh_/255)
-    value_temp = img_temp.mean().mean()
+    value_temp = bf.get_img_mean_value(img_temp)
     if value_temp < 11 and value_temp > 200:
         return 0,0,0
     return 1, thresh_, area_
