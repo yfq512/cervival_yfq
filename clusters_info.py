@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 import basefun as bf
- 
+from tqdm import tqdm
  
 def get_cell_nuclei_mask(img, img_org, value):
     ret_, thresh = cv2.threshold(img, value, 255, cv2.THRESH_BINARY_INV)
@@ -33,7 +33,7 @@ def main2():
     dstroot = 'clusters'
     listcells = os.listdir(dstroot)
     cellsinfo = []
-    for n in listcells:
+    for n,i in zip(listcells,tqdm(range(len(listcells)))):
         cellinfo = {}
         cellpath = os.path.join(dstroot, n)
         img = cv2.imread(cellpath)
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     dstroot = 'clusters'
     listcells = os.listdir(dstroot)
     cellsinfo = []
-    for n in listcells:
+    for n,i in zip(listcells,tqdm(range(len(listcells)))):
         cellinfo = {}
         cellpath = os.path.join(dstroot, n)
         img = cv2.imread(cellpath)

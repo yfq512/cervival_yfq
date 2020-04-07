@@ -1,4 +1,4 @@
-import os,shutil
+import os,shutil,time
 import cv2
 import numpy as np
 import basefun as bf
@@ -6,6 +6,9 @@ import cells_clusters_seg
 import cells_info
 import find_normal_cells
 import clusters_info
+from numba import jit
+
+#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 def clean_file(dst):
     print('================clean dirs================')
@@ -33,6 +36,7 @@ def get_abnormal_cells():
     find_normal_cells.main2()
 
 if __name__ == "__main__":
+    t1 = time.time()
     dst = ['crop','clusters','ab_clusters','valid','invalid','cells_info','ab_cells']
     clean_file(dst)
     fovs_root = 'fovs'
@@ -70,4 +74,4 @@ if __name__ == "__main__":
     print('valid cells cnt:', valid_cells_cnt)
     print('abnormal cells cnt:', ab_cells_cnt)
     print('abnormal clusters cnt:', ab_clusters_cnt)
-
+    print('time cost',time.time() - t1)

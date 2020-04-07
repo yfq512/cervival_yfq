@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 import basefun as bf
- 
+from tqdm import tqdm
  
 def get_cell_nuclei_mask(img, img_org, value):
     ret_, thresh = cv2.threshold(img, value, 255, cv2.THRESH_BINARY_INV)
@@ -28,6 +28,8 @@ def get_cell_nuclei_mask(img, img_org, value):
             long_ = _long
     [w_img,h_img] = thresh.shape
     if (0 in contours_best) or ((w_img-1) in contours_best) or ((h_img-1) in contours_best):
+        return 0, 0, 0, 0, 0, 0, 0, 0
+    if not type(contours_best) == np.ndarray:
         return 0, 0, 0, 0, 0, 0, 0, 0
     area = cv2.contourArea(contours_best)
     perimeter = cv2.arcLength(contours_best,True)
@@ -89,7 +91,7 @@ def get_cell_save_sign(cellinfo):
     nuclei_va = nuclei_area/nuclei_hull_area
     cytoplasm_va = cytoplasm_area/cytoplasm_hull_area
     area_diff = cytoplasm_area - nuclei_area
-    if nuclei_va < 0.9 or cytoplasm_va < 0.85 or area_diff <150:
+    if nuclei_va < 0.95 or cytoplasm_va < 0.85 or area_diff <150:
         sign = 0
     else:
         sign = 1
@@ -99,7 +101,7 @@ def main2():
     dstroot = 'crop'
     listcells = os.listdir(dstroot)
     cellsinfo = []
-    for n in listcells:
+    for n,i in zip(listcells,tqdm(range(len(listcells)))):
         cellinfo = {}
         cellpath = os.path.join(dstroot, n)
         img = cv2.imread(cellpath)
@@ -131,9 +133,10 @@ if __name__ == "__main__":
     dstroot = 'crop'
     listcells = os.listdir(dstroot)
     cellsinfo = []
-    for n in listcells:
+    for n,i in zip(listcells,tqdm(range(len(listcells)))):
         cellinfo = {}
         cellpath = os.path.join(dstroot, n)
+#         print(cellpath)
         img = cv2.imread(cellpath)
         img_gray = cv2.imread(cellpath, 0)
         img_gray = bf.get_fit_img(img_gray)
