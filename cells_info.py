@@ -42,7 +42,8 @@ def get_cell_nuclei_mask(img, img_org, value):
     thresh_ = thresh*0
     thresh__ = cv2.fillPoly(thresh_, [contours_best], 255)
     thresh__ = cv2.polylines(thresh__, [hull], True, 255, 1)
-    value_1,_ = bf.get_2value(img_org,chan=2, mask = thresh__)
+    img_b = img_org[:,:,2]*(thresh__/255)
+    value_1 = bf.get_img_mean_value(img_b)
     return 1, thresh__, cnt+1, area, area2, perimeter, rule, value_1
     
     
@@ -78,7 +79,8 @@ def get_cell_cytoplasm_mask(img, nuclei_mask, nuclei_area, img_org, value):
     thresh__ = cv2.polylines(thresh__, [hull], True, 255, 1)
     nuclei_mask_off = np.ones(nuclei_mask.shape)*255 - nuclei_mask
     thresh___ = thresh__*(nuclei_mask_off/255)
-    value_1,_ = bf.get_2value(img_org,chan = 0,mask = thresh__)
+    img_r = img_org[:,:,0]*(thresh___/255)
+    value_1 = bf.get_img_mean_value(img_r)
     return 1, thresh___, area_, area2, perimeter, rule, value_1
 
 def get_cell_save_sign(cellinfo):
@@ -132,7 +134,7 @@ def main2():
     np.save("./cells_info/cells_info.npy", cellsinfo)
 
 if __name__ == "__main__":
-    dstroot = 'crop'
+    dstroot = 'ab_cells'
     listcells = os.listdir(dstroot)
     cellsinfo = []
     for n,i in zip(listcells,tqdm(range(len(listcells)))):
@@ -142,14 +144,14 @@ if __name__ == "__main__":
         img = cv2.imread(cellpath)
         img_gray = cv2.imread(cellpath, 0)
         img_gray = bf.get_fit_img(img_gray)
-     #   cv2.imwrite(cellpath+'abc0.png',img_gray)
+        cv2.imwrite(cellpath+'abc0.png',img_gray)
         value_1,value_2 = bf.get_2value(img_gray)
         sign_nuclei, cell_nuclei_mask, nuclei_cnt, nuclei_area, nuclei_hull_area, nuclei_circ, nuclei_rule, cell_nuclei_value = get_cell_nuclei_mask(img_gray, img, value_1) #获取细胞核掩码、个数、面积、凸面积、周长、核形规则度、获取细胞核深染程度
-     #   cv2.imwrite(cellpath+'abc1.png',cell_nuclei_mask)
+        cv2.imwrite(cellpath+str(cell_nuclei_value)[0:5]+'abc1.png',cell_nuclei_mask)
         if sign_nuclei == 0:
             continue
         sign_cytoplasm, cell_cytoplasm_mask, cytoplasm_area, cytoplasm_hull_area, cytoplasm_circ, cytoplasm_rule, cell_cytoplasm_value = get_cell_cytoplasm_mask(img_gray, cell_nuclei_mask, nuclei_area,img, value_2) #获取细胞质掩码、面积、凸面积、周长、细胞规则度、获取细胞质情况
-     #   cv2.imwrite(cellpath+'abc2.png',cell_cytoplasm_mask)
+        cv2.imwrite(cellpath+'abc2.png',cell_cytoplasm_mask)
         if sign_cytoplasm == 0 or (cytoplasm_area-nuclei_area) == 0:
             continue
         cell_N_C = nuclei_area/(cytoplasm_area-nuclei_area) #计算核质比
