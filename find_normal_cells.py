@@ -113,7 +113,7 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     mar_cell_N_C = np.array(mar_cell_N_C)
     abnormal_nuclei_area = find_ab_fun(mar_nuclei_area,normal_cell_info['mean_nuclei_area'],2.5)
     abnormal_nuclei_hull_area = find_ab_fun(mar_nuclei_hull_area,normal_cell_info['mean_nuclei_hull_area'],0.1)
-    abnormal_cell_nuclei_value = find_ab_fun(mar_cell_nuclei_value,normal_cell_info['mean_cell_nuclei_value'],-0.2)
+    abnormal_cell_nuclei_value = find_ab_fun(mar_cell_nuclei_value,normal_cell_info['mean_cell_nuclei_value'],1)
     abnormal_cytoplasm_area = find_ab_fun(mar_cytoplasm_area,normal_cell_info['mean_cytoplasm_area'],0.1)
     abnormal_cytoplasm_hull_area = find_ab_fun(mar_cytoplasm_hull_area,normal_cell_info['mean_cytoplasm_hull_area'],0.1)
     abnormal_cell_cytoplasm_value = find_ab_fun(mar_cell_cytoplasm_value,normal_cell_info['mean_cell_cytoplasm_value'],0.1)
@@ -133,7 +133,7 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     cnt_2 = 0
     for n in range(0, cells_infos_2.shape[1]):
         sum_ = sum(cells_infos_2[:,n])
-        if sum_ >= 30:
+        if sum_ >= 40:
             cellpath = cells_info[n]['cellpath']
             newpath = os.path.join('ab_cells', cellpath.split('/')[1])
             shutil.copy(cellpath, newpath)
