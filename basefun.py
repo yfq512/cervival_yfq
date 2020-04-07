@@ -10,6 +10,19 @@ def get_fit_img(img):
     return dst
 
 @jit
+def get_img_mean_value(img):
+    [x_,y_] = img.shape
+    cnt = 0
+    for i in range(0, x_):
+        for j in range(0, y_):
+            temp_ = img[i,j]
+            if temp_ > 10 and temp_ <200:
+                cnt = cnt + 1
+    sum_ = img.sum().sum()
+    mean_ = sum_/cnt
+    return mean_
+
+@jit
 def get_mean(temp, long_=10):
     temp_1 = []
     for m in range(0+long_, 255-long_):
