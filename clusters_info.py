@@ -18,6 +18,8 @@ def get_cell_nuclei_mask(img, img_org, value):
         if area > area_:
             contours_max = contours[cnt]
             area_ = area
+    if not type(contours_max) == np.ndarray:
+        return 0,0,0,0,0,0,0
     thresh_ = cv2.fillPoly(thresh, [contours_max], 255)
     return thresh_, area_
     

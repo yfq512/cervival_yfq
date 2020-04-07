@@ -58,6 +58,8 @@ def get_cell_cytoplasm_mask(img, nuclei_mask, nuclei_area, img_org, value):
         if area > area_:
             contours_max = contours[cnt]
             area_ = area
+    if not type(contours_max) == np.ndarray:
+        return 0,0,0,0,0,0,0
     hull = cv2.convexHull(contours_max)
     area2 = cv2.contourArea(hull)
     perimeter = cv2.arcLength(contours_max,True)
