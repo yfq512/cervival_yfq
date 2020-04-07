@@ -27,7 +27,7 @@ def get_cells(img, imgpath, value, fit, limit_up, limit_down, side=5):
     return cells_xoy
  
 # 获得细胞团坐标
-def get_clusters(img, value, fit, limit_down, side=5):
+def get_clusters(img, value, fit, limit_down, limit_up, side=5):
     ret_, thresh = cv2.threshold(img, value, 255, cv2.THRESH_BINARY_INV)
     thresh = bf.get_img_close(thresh,fit*0.05) #将密集的点连接成片
     fit2 = fit*0.1
@@ -43,7 +43,7 @@ def get_clusters(img, value, fit, limit_down, side=5):
         y1 = max(y-side,0)
         y2 = min(y+h+side,y_)
         cluster_xoy = [x1,y1,x2,y2]
-        if area > limit_down:
+        if area > limit_down and area < limit_up:
             clusters_xoy.append(cluster_xoy)
     return clusters_xoy
  
@@ -77,7 +77,7 @@ def main2():
         kernel_2 = np.ones((5,5),np.uint8)
         cells_xoy = get_cells(img_gray_fit, imgpath, value_2+10, kernel_1, 50000, 1600, side=5)
         value_1,value_2 = bf.get_2value(img_gray_fit, grien=3)
-        clusters_xoy = get_clusters(img_gray_fit, value_1, kernel_2, 20000, side=5)
+        clusters_xoy = get_clusters(img_gray_fit, value_1, kernel_2, 20000, 1000000, side=5)
         crop_from_fov(img_org, n, cells_xoy)
         crop_from_fov(img_org, n, clusters_xoy, root_ = 'clusters')
 if __name__ == "__main__":
