@@ -15,7 +15,7 @@ def get_img_mean_value(img):
     for i in range(0, x_):
         for j in range(0, y_):
             temp_ = img[i,j]
-            if temp_ > 10 and temp_ <200:
+            if temp_ > 11 and temp_ <100:
                 cnt = cnt + 1
     sum_ = img.sum().sum()
     mean_ = sum_/cnt
