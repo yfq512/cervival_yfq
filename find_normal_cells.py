@@ -43,6 +43,7 @@ def get_normal_cell_info(cells_info_file ,normal_cells_i):
     mar_cytoplasm_area = []
     mar_cytoplasm_rule = []
     mar_cell_cytoplasm_value = []
+    mar_cytoplasm_var = []
     mar_cell_N_C = []
     cnt = 0
     for n in cells_info:
@@ -53,6 +54,7 @@ def get_normal_cell_info(cells_info_file ,normal_cells_i):
             mar_cytoplasm_area.append(n['cytoplasm_area'])
             mar_cytoplasm_rule.append(n['cytoplasm_rule'])
             mar_cell_cytoplasm_value.append(n['cell_cytoplasm_value'])
+            mar_cytoplasm_var.append(n['cytoplasm_var'])
             mar_cell_N_C.append(n['cell_N_C'])
         cnt = cnt + 1
     mean_nuclei_area = np.array(mar_nuclei_area).mean()
@@ -61,9 +63,10 @@ def get_normal_cell_info(cells_info_file ,normal_cells_i):
     mean_cytoplasm_area = np.array(mar_cytoplasm_area).mean()
     mean_cytoplasm_rule = np.array(mar_cytoplasm_rule).mean()
     mean_cell_cytoplasm_value = np.array(mar_cell_cytoplasm_value).mean()
+    mean_cytoplasm_var = np.array(mar_cytoplasm_var).mean()
     mean_cell_N_C = np.array(mar_cell_N_C).mean()
-    cell_keys = ['mean_nuclei_area','mean_nuclei_rule','mean_cell_nuclei_value','mean_cytoplasm_area','mean_cytoplasm_rule','mean_cell_cytoplasm_value','mean_cell_N_C']
-    cell_values = [mean_nuclei_area,mean_nuclei_rule,mean_cell_nuclei_value,mean_cytoplasm_area,mean_cytoplasm_rule,mean_cell_cytoplasm_value,mean_cell_N_C]
+    cell_keys = ['mean_nuclei_area','mean_nuclei_rule','mean_cell_nuclei_value','mean_cytoplasm_area','mean_cytoplasm_rule','mean_cell_cytoplasm_value','mean_cytoplasm_var','mean_cell_N_C']
+    cell_values = [mean_nuclei_area,mean_nuclei_rule,mean_cell_nuclei_value,mean_cytoplasm_area,mean_cytoplasm_rule,mean_cell_cytoplasm_value,mean_cytoplasm_var,mean_cell_N_C]
     cell_dict = dict(zip(cell_keys, cell_values))
     return cell_dict
 
@@ -95,6 +98,7 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     mar_cytoplasm_area = []
     mar_cytoplasm_rule = []
     mar_cell_cytoplasm_value = []
+    mar_cytoplasm_var = []
     mar_cell_N_C = []
     cnt = 0
     for n in cells_info:
@@ -104,6 +108,7 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
         mar_cytoplasm_area.append(n['cytoplasm_area'])
         mar_cytoplasm_rule.append(n['cytoplasm_rule'])
         mar_cell_cytoplasm_value.append(n['cell_cytoplasm_value'])
+        mar_cytoplasm_var.append(n['cytoplasm_var'])
         mar_cell_N_C.append(n['cell_N_C'])
         cnt = cnt + 1
     mar_nuclei_area = np.array(mar_nuclei_area)
@@ -112,6 +117,7 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     mar_cytoplasm_area = np.array(mar_cytoplasm_area)
     mar_cytoplasm_rule = np.array(mar_cytoplasm_rule)
     mar_cell_cytoplasm_value = np.array(mar_cell_cytoplasm_value)
+    mar_cytoplasm_var = np.array(mar_cytoplasm_var)
     mar_cell_N_C = np.array(mar_cell_N_C)
     abnormal_nuclei_area = find_ab_fun(mar_nuclei_area,normal_cell_info['mean_nuclei_area'],2)
     abnormal_nuclei_rule = find_ab_fun(mar_nuclei_rule,normal_cell_info['mean_nuclei_rule'],-0.02)
@@ -119,9 +125,10 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     abnormal_cytoplasm_area = find_ab_fun(mar_cytoplasm_area,normal_cell_info['mean_cytoplasm_area'],-0.2)
     abnormal_cytoplasm_rule = find_ab_fun(mar_cytoplasm_rule,normal_cell_info['mean_cytoplasm_rule'],-0.02)
     abnormal_cell_cytoplasm_value = find_ab_fun(mar_cell_cytoplasm_value,normal_cell_info['mean_cell_cytoplasm_value'],0.2)
-    abnormal_cell_N_C = find_ab_fun(mar_cell_N_C,normal_cell_info['mean_cell_N_C'],5)
+    abnormal_cytoplasm_var = find_ab_fun(mar_cytoplasm_rule,normal_cell_info['mean_cytoplasm_var'],0.2)
+    abnormal_cell_N_C = find_ab_fun(mar_cell_N_C,normal_cell_info['mean_cell_N_C'],2)
     cells_infos = []
-    cells_infos = [abnormal_nuclei_area,abnormal_nuclei_rule,abnormal_cell_nuclei_value,abnormal_cytoplasm_area,abnormal_cytoplasm_rule,abnormal_cell_cytoplasm_value,abnormal_cell_N_C]
+    cells_infos = [abnormal_nuclei_area,abnormal_nuclei_rule,abnormal_cell_nuclei_value,abnormal_cytoplasm_area,abnormal_cytoplasm_rule,abnormal_cell_cytoplasm_value,abnormal_cytoplasm_var,abnormal_cell_N_C]
     cells_infos = np.array(cells_infos)
     cells_infos_2 = cells_infos.copy()
     cells_infos_2[0,:] = cells_infos[0,:] * 10 #综合权重
@@ -130,7 +137,8 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     cells_infos_2[3,:] = cells_infos[3,:] * 0
     cells_infos_2[4,:] = cells_infos[4,:] * 0
     cells_infos_2[5,:] = cells_infos[5,:] * 0
-    cells_infos_2[6,:] = cells_infos[6,:] * 10
+    cells_infos_2[5,:] = cells_infos[6,:] * 0
+    cells_infos_2[6,:] = cells_infos[7,:] * 10
     cells_infos_2 = np.array(cells_infos_2)
     cnt_2 = 0
     for n in range(0, cells_infos_2.shape[1]):
