@@ -120,13 +120,13 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     mar_cytoplasm_var = np.array(mar_cytoplasm_var)
     mar_cell_N_C = np.array(mar_cell_N_C)
     abnormal_nuclei_area = find_ab_fun(mar_nuclei_area,normal_cell_info['mean_nuclei_area'],2)
-    abnormal_nuclei_rule = find_ab_fun(mar_nuclei_rule,normal_cell_info['mean_nuclei_rule'],-0.02)
-    abnormal_cell_nuclei_value = find_ab_fun(mar_cell_nuclei_value,normal_cell_info['mean_cell_nuclei_value'],0.2)
-    abnormal_cytoplasm_area = find_ab_fun(mar_cytoplasm_area,normal_cell_info['mean_cytoplasm_area'],-0.2)
+    abnormal_nuclei_rule = find_ab_fun(mar_nuclei_rule,normal_cell_info['mean_nuclei_rule'],-0.01)
+    abnormal_cell_nuclei_value = find_ab_fun(mar_cell_nuclei_value,normal_cell_info['mean_cell_nuclei_value'],0.1)
+    abnormal_cytoplasm_area = find_ab_fun(mar_cytoplasm_area,normal_cell_info['mean_cytoplasm_area'],-0.1)
     abnormal_cytoplasm_rule = find_ab_fun(mar_cytoplasm_rule,normal_cell_info['mean_cytoplasm_rule'],-0.02)
-    abnormal_cell_cytoplasm_value = find_ab_fun(mar_cell_cytoplasm_value,normal_cell_info['mean_cell_cytoplasm_value'],0.2)
-    abnormal_cytoplasm_var = find_ab_fun(mar_cytoplasm_rule,normal_cell_info['mean_cytoplasm_var'],0.2)
-    abnormal_cell_N_C = find_ab_fun(mar_cell_N_C,normal_cell_info['mean_cell_N_C'],2)
+    abnormal_cell_cytoplasm_value = find_ab_fun(mar_cell_cytoplasm_value,normal_cell_info['mean_cell_cytoplasm_value'],0.1)
+    abnormal_cytoplasm_var = find_ab_fun(mar_cytoplasm_rule,normal_cell_info['mean_cytoplasm_var'],0.1)
+    abnormal_cell_N_C = find_ab_fun(mar_cell_N_C,normal_cell_info['mean_cell_N_C'],4)
     cells_infos = []
     cells_infos = [abnormal_nuclei_area,abnormal_nuclei_rule,abnormal_cell_nuclei_value,abnormal_cytoplasm_area,abnormal_cytoplasm_rule,abnormal_cell_cytoplasm_value,abnormal_cytoplasm_var,abnormal_cell_N_C]
     cells_infos = np.array(cells_infos)
@@ -143,9 +143,18 @@ def find_abnormal_cells(cells_info_file, normal_cell_info):
     cnt_2 = 0
     for n in range(0, cells_infos_2.shape[1]):
         sum_ = sum(cells_infos_2[:,n])
-        if sum_ >= 20:
+        #if sum_ >= 20:
+        if True:
             cellpath = cells_info[n]['cellpath']
-            newpath = os.path.join('ab_cells', cellpath.split('/')[1])
+            nuclei_area_name = cells_info[n]['nuclei_area']
+            nuclei_rule_name = cells_info[n]['nuclei_rule']
+            cell_nuclei_value_name = cells_info[n]['cell_nuclei_value']
+            cytoplasm_area_name = cells_info[n]['cytoplasm_area']
+            cytoplasm_rule_name = cells_info[n]['cytoplasm_rule']
+            cell_cytoplasm_value_name = cells_info[n]['cell_cytoplasm_value']
+            cytoplasm_var_name = cells_info[n]['cytoplasm_var']
+            cell_N_C_name = cells_info[n]['cell_N_C']
+            newpath = os.path.join('ab_cells', cellpath.split('/')[1]+'_'+'nuarea'+str(nuclei_area_name)[0:5]+'_'+'nurule'+str(nuclei_rule_name)[0:5]+'_'+'nuvalue'+str(cell_nuclei_value_name)[0:5]+'_'+'cyarea'+str(cytoplasm_area_name)[0:5]+'_'+'cyrule'+str(cytoplasm_rule_name)[0:5]+'_'+'cyvalue'+str(cell_cytoplasm_value_name)[0:5]+'_'+'cyvar'+str(cytoplasm_var_name)[0:5]+'_'+'NC'+str(cell_N_C_name)[0:5]+'.png')
             shutil.copy(cellpath, newpath)
             cnt_2 = cnt_2 + 1
     sign = 0
