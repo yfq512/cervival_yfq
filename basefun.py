@@ -9,6 +9,17 @@ def get_fit_img(img):
     dst = cv2.fastNlMeansDenoising(img,None,8,7,21)
     return dst
 
+def get_img_var(img):
+    temp = []
+    [x_,y_] = img.shape
+    for i in range(0, x_):
+        for j in range(0, y_):
+            if not img[i,j] == 0:
+                temp.append(img[i,j])
+    temp = np.array(temp)
+    var = temp.var()
+    return var
+
 def get_img_mean_value(img):
     [x_,y_] = img.shape
     cnt = 0
