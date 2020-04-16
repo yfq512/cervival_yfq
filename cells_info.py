@@ -82,7 +82,7 @@ def get_cell_cytoplasm_mask(img, nuclei_mask, nuclei_area, img_org, value):
     img_r = img_org[:,:,0]*(thresh___/255)
     value_1 = bf.get_img_mean_value(img_r)
     img_cytoplasm = img*(thresh___/255)
-    cytoplasm_var = img_cytoplasm.var()
+    cytoplasm_var = bf.get_img_var(img_cytoplasm)
     return 1, thresh___, area_, area2, perimeter, rule, value_1, cytoplasm_var
 
 def get_cell_save_sign(cellinfo):
@@ -136,7 +136,7 @@ def main2():
     np.save("./cells_info/cells_info.npy", cellsinfo)
 
 if __name__ == "__main__":
-    dstroot = 'ab_cells'
+    dstroot = 'crop'
     listcells = os.listdir(dstroot)
     cellsinfo = []
     for n,i in zip(listcells,tqdm(range(len(listcells)))):
